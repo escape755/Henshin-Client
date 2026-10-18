@@ -1,79 +1,55 @@
-name: Build Lumina (debug APK)
+name: Build Debug APK
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [master, main, develop]
+  pull_request:
+    branches: [master, main, develop]
   workflow_dispatch:
 
 jobs:
-  build:
+  debug-build:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
 
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-      - name: JDK 17
+      # Si los submódulos no quedaron registrados en el repo, los clonamos a mano
+      - name: Ensure native dependencies
+        run: |
+          if [ ! -f app/src/main/cpp/Preloader/CMakeLists.txt ]; then
+            rm -rf app/src/main/cpp/Preloader
+            git clone --depth 1 https://github.com/Viablecobra/Preloader.git app/src/main/cpp/Preloader
+          fi
+
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: '21'
 
-      - name: Android SDK
-        uses: android-actions/setup-android@v3
-
-      # app usa compileSdk 36, pero :Pixie usa compileSdk 34. Se instalan los dos
-      # (y las build-tools) para no depender de la descarga automatica de AGP.
-      - name: SDK packages (platforms 36 + 34, build-tools 35, CMake 3.22.1)
+      - name: Install NDK and CMake
         run: |
-          yes | sdkmanager --licenses > /dev/null || true
-          sdkmanager "platforms;android-36" "platforms;android-34" "build-tools;35.0.0" "cmake;3.22.1"
+          SDKM="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKM" --licenses > /dev/null || true
+          "$SDKM" "ndk;27.2.12479018" "cmake;3.22.1" "build-tools;36.0.0" "platforms;android-36"
 
-      - name: Gradle cache
+      - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      # El proyecto aplica el plugin de Google Services pero google-services.json no esta en el repo.
-      # Este archivo de relleno solo sirve para que compile; Firebase/Crashlytics no funcionaran.
-      - name: Placeholder google-services.json
-        run: |
-          cat > app/google-services.json << 'JSON'
-          {
-            "project_info": {
-              "project_number": "000000000000",
-              "project_id": "lumina-ci",
-              "storage_bucket": "lumina-ci.appspot.com"
-            },
-            "client": [
-              {
-                "client_info": {
-                  "mobilesdk_app_id": "1:000000000000:android:0000000000000000",
-                  "android_client_info": { "package_name": "com.project.lumina.client" }
-                },
-                "api_key": [ { "current_key": "AIzaSyCIplaceholder0000000000000000000" } ]
-              }
-            ],
-            "configuration_version": "1"
-          }
-          JSON
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
 
-      - name: Build debug APK
-        run: |
-          set -o pipefail
-          chmod +x gradlew
-          ./gradlew :app:assembleDebug --no-daemon --stacktrace 2>&1 | tee build.log
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug --stacktrace
 
-      # Si el build falla, esto deja el error real al FINAL del log (donde siempre
-      # se mira), en vez de enterrado en miles de lineas de arriba.
-      - name: Resumen de errores
-        if: failure()
-        run: |
-          echo "=============== RESUMEN DE ERRORES ==============="
-          grep -nE "^e: |error:|What went wrong|Execution failed|FAILURE|Could not|SDK location|NDK|CMake|license" build.log | head -60 || true
-
-      - name: Upload APK
+      - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: lumina-debug-apk
+          name: henshin-debug-apk-${{ github.run_number }}
           path: app/build/outputs/apk/debug/*.apk
+          retention-days: 14
           if-no-files-found: error
