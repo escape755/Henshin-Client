@@ -697,14 +697,14 @@ public class DashboardFragment extends BaseThemedFragment {
         return;
       }
 
-      Uri fileUri = FileProvider.getUriForFile ( this, getApplicationContext().getPackageName() + ".FileProvider", file);
+      Uri fileUri = FileProvider.getUriForFile(requireContext(), requireContext().getPackageName() + ".FileProvider", file);
       Intent shareIntent = new Intent(Intent.ACTION_SEND);
           shareIntent.setType("application/json");
               shareIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
                   shareIntent.putExtra(Intent.EXTRA_SUBJECT, "config.json");
                       shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-                      startActivity(Intent.createChooser(shareIntent));
+                      startActivity(Intent.createChooser(shareIntent, "Compartir config.json"));
     }
     private void openFileChooser() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
