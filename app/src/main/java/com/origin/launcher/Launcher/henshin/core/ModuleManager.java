@@ -25,6 +25,9 @@ import com.origin.launcher.Launcher.henshin.module.Velocity;
 import com.origin.launcher.Launcher.henshin.module.ItemEsp;
 import com.origin.launcher.Launcher.henshin.module.KillAura;
 import com.origin.launcher.Launcher.henshin.module.Spider;
+import com.origin.launcher.Launcher.henshin.module.Watermark;
+import com.origin.launcher.Launcher.henshin.module.AutoWalk;
+import com.origin.launcher.Launcher.henshin.module.AntiAFK;
 import com.origin.launcher.Launcher.henshin.value.Value;
 
 import java.util.ArrayList;
@@ -89,6 +92,10 @@ public final class ModuleManager {
         modules.add(new Fly());
         modules.add(new Jetpack());
         modules.add(new Velocity());
+        // Abysm ports that run entirely inside the launcher (no relay / proxy)
+        modules.add(new Watermark());
+        modules.add(new AutoWalk());
+        modules.add(new AntiAFK());
         modules.addAll(LegitModules.create());
     }
 

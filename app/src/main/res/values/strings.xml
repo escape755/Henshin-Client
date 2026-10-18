@@ -6,7 +6,6 @@
 	<string name="henshinversion">Henshin Client v1.6</string>
 	<string name="welcome">Henshin Client - Minecraft Bedrock Client</string>
 	<string name="mc_pkgname">minecraft package id:</string>
-<string name="thank_you_support">Thank you for your support</string>
 <string name="version_isolation">Version isolation</string>
 
 <!--crash activity-->

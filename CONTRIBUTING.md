@@ -33,11 +33,11 @@ Whether you're fixing bugs, improving performance, building new features, or enh
 ## 🚀 Getting Started
 
 ### 1. Fork the Repository
-Click the **Fork** button at the top of the [Henshin Client repo](https://github.com/Xelo-Client/Xelo) to create your own copy.
+Click the **Fork** button at the top of the Henshin Client repository to create your own copy.
 
 ### 2. Clone Your Fork
 ```bash
-git clone https://github.com/Xelo-Client/Xelo.git
+git clone <url-of-your-fork>
 cd Henshin
 ```
 
@@ -97,14 +97,13 @@ Then go to your fork and click **"Compare & pull request"**.
 ## 🤝 Code of Conduct
 
 Please be respectful and inclusive.  
-We follow a standard [Code of Conduct](https://github.com/Xelo-Client/Xelo/blob/main/CODE_OF_CONDUCT.md).
+We follow a standard Code of Conduct.
 
 ---
 
 ## 🙌 Need Help?
 
-- 💬 Join our Discord: [https://dsc.gg/origin-client](https://dsc.gg/origin-client)
-- 🐞 Found a bug? [Open an issue](https://github.com/Xelo-Client/Xelo/issues)
+- 🐞 Found a bug? Open an issue in the repository
 - 🧠 First time contributing? Ask for help — we’re friendly!
 
 ---

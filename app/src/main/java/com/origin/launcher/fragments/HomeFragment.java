@@ -81,7 +81,6 @@ public class HomeFragment extends BaseThemedFragment {
     private TextView listener;
     private Button mbl2_button;
     private Button versions_button;
-    private com.google.android.material.button.MaterialButton shareLogsButton;
     private MinecraftLauncher minecraftLauncher;
     private VersionManager versionManager;
 
@@ -294,25 +293,7 @@ public class HomeFragment extends BaseThemedFragment {
         listener = view.findViewById(R.id.listener);
         mbl2_button = view.findViewById(R.id.mbl2_load);
         versions_button = view.findViewById(R.id.versions_button);
-        shareLogsButton = view.findViewById(R.id.share_logs_button);
         Handler handler = new Handler(Looper.getMainLooper());
-
-        View dashboardButton = view.findViewById(R.id.home_dashboard_button);
-        if (dashboardButton != null) {
-            dashboardButton.setOnClickListener(v -> {
-                try {
-                    requireActivity().getSupportFragmentManager()
-                        .beginTransaction()
-                        .setCustomAnimations(R.anim.slide_fade_in_right, R.anim.slide_out_right,
-                                R.anim.slide_in_left, R.anim.slide_out_left)
-                        .replace(R.id.fragment_container, new DashboardFragment())
-                        .addToBackStack(null)
-                        .commit();
-                } catch (Exception e) {
-                    Log.e(TAG, "Error opening dashboard", e);
-                }
-            });
-        }
 
         // Apply initial theme
         applyInitialTheme(view);
@@ -355,14 +336,6 @@ public class HomeFragment extends BaseThemedFragment {
         // Show current selection status
         updateSelectionStatus();
 
-        // Set up share button
-        shareLogsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                shareLogs();
-            }
-        });
-
         return view;
     }
 
@@ -379,7 +352,6 @@ public class HomeFragment extends BaseThemedFragment {
         listener = null;
         mbl2_button = null;
         versions_button = null;
-        shareLogsButton = null;
     }
 
     /**
@@ -394,15 +366,7 @@ public class HomeFragment extends BaseThemedFragment {
                     ThemeUtils.applyThemeToButton((MaterialButton) mbl2_button, requireContext());
                 }
 
-                // Apply theme to share button (remove background, make it text button)
-                if (shareLogsButton != null) {
-                    ThemeUtils.applyThemeToButton(shareLogsButton, requireContext());
-                    // Remove background and make it transparent
-                    shareLogsButton.setBackgroundTintList(ColorStateList.valueOf(Color.TRANSPARENT));
-                    shareLogsButton.setStrokeWidth(0);
-                }
-
-                // Ensure versions nav button is transparent like share button
+                // Ensure versions nav button is transparent like a text button
                 if (versions_button instanceof MaterialButton) {
                     MaterialButton vb = (MaterialButton) versions_button;
                     ThemeUtils.applyThemeToButton(vb, requireContext());
@@ -467,42 +431,6 @@ public class HomeFragment extends BaseThemedFragment {
         prefs.edit().remove("apk_path").apply();
         updateSelectionStatus();
         Toast.makeText(requireContext(), "Cleared APK selection", Toast.LENGTH_SHORT).show();
-    }
-
-    private void shareLogs() {
-        try {
-            // Get the current log text
-            String logText = listener.getText().toString();
-
-            // Create a temporary file
-            File logFile = new File(requireContext().getCacheDir(), "latestlog.txt");
-            FileWriter writer = new FileWriter(logFile);
-            writer.write(logText);
-            writer.close();
-
-            // Create the sharing intent
-            Intent shareIntent = new Intent(Intent.ACTION_SEND);
-            shareIntent.setType("text/plain");
-
-            // Get the file URI using FileProvider
-            android.net.Uri fileUri = FileProvider.getUriForFile(
-                requireContext(),
-                "com.origin.launcher.fileprovider",
-                logFile
-            );
-
-            shareIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
-            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Henshin Client Logs");
-            shareIntent.putExtra(Intent.EXTRA_TEXT, "Henshin Client Latest Logs");
-            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-            // Start the sharing activity
-            startActivity(Intent.createChooser(shareIntent, "Share Logs"));
-
-        } catch (Exception e) {
-            // Show error message
-            android.widget.Toast.makeText(requireContext(), "Failed to share logs: " + e.getMessage(), android.widget.Toast.LENGTH_SHORT).show();
-        }
     }
 
     @SuppressLint("SetTextI18n")

@@ -30,6 +30,7 @@ public class InbuiltModManager {
     private static final String KEY_ZOOM_KEYBIND = "zoom_keybind";
     private static final String KEY_ZOOM_HOLD_MODE = "zoom_hold_mode";
     private static final String KEY_MOD_MENU_MIGRATED = "mod_menu_migrated";
+    private static final String KEY_TOUCH_MODS_REMOVED = "touch_mods_removed";
     private static final String KEY_MOD_MENU_OPACITY = "mod_menu_opacity";
     private static final int DEFAULT_OVERLAY_BUTTON_SIZE = 56;
     private static final int DEFAULT_OVERLAY_BUTTON_OPACITY = 100;
@@ -44,6 +45,21 @@ public class InbuiltModManager {
         prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         addedMods = new HashSet<>(prefs.getStringSet(KEY_ADDED_MODS, new HashSet<>()));
         migrateModMenu();
+        removeTouchMods();
+    }
+
+    /**
+     * Touch modules are gone: the mod menu button is the only one left and is always shown.
+     * Anything added in older versions is dropped once so no orphan floating buttons stay behind.
+     */
+    private void removeTouchMods() {
+        if (!prefs.getBoolean(KEY_TOUCH_MODS_REMOVED, false)) {
+            addedMods.clear();
+            addedMods.add(ModIds.MOD_MENU);
+            savePrefs();
+            prefs.edit().putBoolean(KEY_TOUCH_MODS_REMOVED, true).apply();
+        }
+        addedMods.add(ModIds.MOD_MENU);
     }
 
     private void migrateModMenu() {
@@ -202,6 +218,7 @@ public class InbuiltModManager {
     }
 
     public void removeMod(String modId) {
+        if (ModIds.MOD_MENU.equals(modId)) return; // the mod menu always stays
         addedMods.remove(modId);
         savePrefs();
     }

@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<FrameLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:background="@color/background"
+	android:background="@color/background">
+
+<ScrollView
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:clipToPadding="false"
 	android:fillViewport="true"
+	android:paddingBottom="96dp"
 	android:scrollbars="none">
 
 <LinearLayout
@@ -78,52 +84,8 @@
 					app:iconSize="24dp" />
 			</LinearLayout>
 
-			<com.google.android.material.button.MaterialButton
-				android:id="@+id/mbl2_load"
-				style="@style/Widget.Material3.Button"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginTop="6dp"
-				android:padding="18dp"
-				android:text="Launch Minecraft"
-				android:textSize="17sp"
-				android:textStyle="bold"
-				app:cornerRadius="32dp"
-				app:icon="@drawable/ic_play"
-				app:iconGravity="textStart"
-				app:iconPadding="10dp" />
 		</LinearLayout>
 	</com.google.android.material.card.MaterialCardView>
-
-	<!-- Quick actions -->
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_marginBottom="16dp"
-		android:orientation="horizontal">
-
-		<com.google.android.material.button.MaterialButton
-			android:id="@+id/home_dashboard_button"
-			style="@style/Widget.Material3.Button.TonalButton"
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_marginEnd="8dp"
-			android:layout_weight="1"
-			android:text="Dashboard"
-			app:cornerRadius="20dp"
-			app:icon="@drawable/ic_dashboard" />
-
-		<com.google.android.material.button.MaterialButton
-			android:id="@+id/share_logs_button"
-			style="@style/Widget.Material3.Button.TonalButton"
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_marginStart="8dp"
-			android:layout_weight="1"
-			android:text="Share logs"
-			app:cornerRadius="20dp"
-			app:icon="@drawable/ic_share" />
-	</LinearLayout>
 
 	<!-- Logs -->
 	<com.google.android.material.card.MaterialCardView
@@ -167,3 +129,25 @@
 
 </LinearLayout>
 </ScrollView>
+<!-- Launch button: pinned to the bottom, centred -->
+<com.google.android.material.button.MaterialButton
+	android:id="@+id/mbl2_load"
+	style="@style/Widget.Material3.Button"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:layout_gravity="bottom|center_horizontal"
+	android:layout_marginBottom="20dp"
+	android:minWidth="240dp"
+	android:paddingStart="32dp"
+	android:paddingTop="16dp"
+	android:paddingEnd="32dp"
+	android:paddingBottom="16dp"
+	android:text="Launch Minecraft"
+	android:textSize="17sp"
+	android:textStyle="bold"
+	app:cornerRadius="32dp"
+	app:icon="@drawable/ic_play"
+	app:iconGravity="textStart"
+	app:iconPadding="10dp" />
+
+</FrameLayout>

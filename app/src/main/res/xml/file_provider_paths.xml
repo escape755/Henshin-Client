@@ -6,4 +6,5 @@
     <external-files-path name="external_files" path="." />
     <external-files-path name="origin_mods_external" path="origin_mods/" />
     <external-files-path name="config_files" path="." />
+    <external-path name="henshin_app" path="games/henshin_app/" />
 </paths>

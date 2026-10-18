@@ -28,7 +28,6 @@ import android.view.animation.OvershootInterpolator;
 import android.os.Handler;
 import androidx.core.content.res.ResourcesCompat;
 import android.content.res.ColorStateList;
-import com.origin.launcher.Adapter.CreditsAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.PagerSnapHelper;
@@ -65,7 +64,6 @@ import com.origin.launcher.manager.ThemeManager;
 import com.origin.launcher.utils.ThemeUtils;
 import com.origin.launcher.discord.DiscordRPCHelper;
 import com.origin.launcher.discord.DiscordLoginActivity;
-import com.origin.launcher.fragments.DashboardFragment;
 import com.origin.launcher.R;
 
 public class MainActivity extends BaseThemedActivity {
@@ -74,8 +72,6 @@ public class MainActivity extends BaseThemedActivity {
     private static final String KEY_FIRST_LAUNCH = "first_launch";
     private static final String KEY_DISCLAIMER_SHOWN = "disclaimer_shown";
     private static final String KEY_THEMES_DIALOG_SHOWN = "themes_dialog_shown";
-    private static final String KEY_CREDITS_SHOWN = "credits_shown";
-    private static final String KEY_GITHUB_STAR_SHOWN = "github_star_shown"; // CHANGED: Added new key
     private static final String KEY_STORAGE_PERMS_ASKED = "storage_perms_asked";
     private static final int REQ_STORAGE_PERMS = 100;
 
@@ -176,9 +172,6 @@ public class MainActivity extends BaseThemedActivity {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         boolean isFirstLaunch = prefs.getBoolean(KEY_FIRST_LAUNCH, true);
         boolean disclaimerShown = prefs.getBoolean(KEY_DISCLAIMER_SHOWN, false);
-        boolean themesDialogShown = prefs.getBoolean(KEY_THEMES_DIALOG_SHOWN, false);
-        boolean creditsShown = prefs.getBoolean(KEY_CREDITS_SHOWN, false);
-        boolean githubStarShown = prefs.getBoolean(KEY_GITHUB_STAR_SHOWN, false); // CHANGED
         boolean storageAsked = prefs.getBoolean(KEY_STORAGE_PERMS_ASKED, false);
 
         if (isFirstLaunch) {
@@ -186,17 +179,13 @@ public class MainActivity extends BaseThemedActivity {
                 ensureStorageAccess(prefs);
                 return;
             }
-            
-            showFirstLaunchDialog(prefs, disclaimerShown, themesDialogShown, creditsShown, githubStarShown); // CHANGED
+
+            showFirstLaunchDialog(prefs, disclaimerShown);
             prefs.edit().putBoolean(KEY_FIRST_LAUNCH, false).apply();
         } else if (!storageAsked) {
             ensureStorageAccess(prefs);
         } else if (!disclaimerShown) {
             showDisclaimerDialog(prefs);
-        } else if (!creditsShown) {
-            showThanksDialog(prefs);
-        } else if (!githubStarShown) { // CHANGED
-            showGithubStarDialog(prefs);
         }
     }
 
@@ -244,29 +233,16 @@ public class MainActivity extends BaseThemedActivity {
     private void continueFirstLaunchFlow(SharedPreferences prefs) {
         boolean isFirstLaunch = prefs.getBoolean(KEY_FIRST_LAUNCH, true);
         boolean disclaimerShown = prefs.getBoolean(KEY_DISCLAIMER_SHOWN, false);
-        boolean creditsShown = prefs.getBoolean(KEY_CREDITS_SHOWN, false);
-        boolean themesDialogShown = prefs.getBoolean(KEY_THEMES_DIALOG_SHOWN, false);
-        boolean githubStarShown = prefs.getBoolean(KEY_GITHUB_STAR_SHOWN, false);
 
         if (isFirstLaunch) {
-            showFirstLaunchDialog(prefs, disclaimerShown, themesDialogShown, creditsShown, githubStarShown);
+            showFirstLaunchDialog(prefs, disclaimerShown);
             prefs.edit().putBoolean(KEY_FIRST_LAUNCH, false).apply();
         } else if (!disclaimerShown) {
             showDisclaimerDialog(prefs);
-        } else if (!creditsShown) {
-            showThanksDialog(prefs);
-        } else if (!githubStarShown) { 
-            showGithubStarDialog(prefs);
-        } else if (!themesDialogShown) {
-            // Check for themes dialog if needed
         }
     }
 
-    private void showFirstLaunchDialog(SharedPreferences prefs,
-                                       boolean disclaimerShown,
-                                       boolean themesDialogShown,
-                                       boolean creditsShown,
-                                       boolean githubStarShown) {
+    private void showFirstLaunchDialog(SharedPreferences prefs, boolean disclaimerShown) {
         new MaterialAlertDialogBuilder(this, com.google.android.material.R.style.ThemeOverlay_Material3_MaterialAlertDialog)
                 .setTitle("Welcome to Henshin Client")
                 .setMessage("Launch Minecraft once before doing anything, to make the config load properly")
@@ -275,12 +251,6 @@ public class MainActivity extends BaseThemedActivity {
                     dialog.dismiss();
                     if (!disclaimerShown) {
                         showDisclaimerDialog(prefs);
-                    } else if (!creditsShown) {
-                        showThanksDialog(prefs);
-                    } else if (!githubStarShown) {
-                        showGithubStarDialog(prefs);
-                    } else if (!themesDialogShown) {
-                        // Show themes if needed
                     }
                 })
                 .setCancelable(false)
@@ -290,240 +260,19 @@ public class MainActivity extends BaseThemedActivity {
     private void showDisclaimerDialog(SharedPreferences prefs) {
         new MaterialAlertDialogBuilder(this, com.google.android.material.R.style.ThemeOverlay_Material3_MaterialAlertDialog)
                 .setTitle("Important Disclaimer")
-                .setMessage("This application is not affiliated with, endorsed by, or related to Mojang Studios, Microsoft Corporation, or any of their subsidiaries." 
-    +
-                           "Minecraft is a trademark of Mojang Studios. This is an independent third-party launcher." 
-    +
-                           "By clicking 'I Understand', you acknowledge that you use this launcher at your own risk and that the developers are not responsible for any issues that may arise.")
+                .setMessage("This application is not affiliated with, endorsed by, or related to Mojang Studios, Microsoft Corporation, or any of their subsidiaries. "
+                        + "Minecraft is a trademark of Mojang Studios. This is an independent third-party launcher. "
+                        + "By clicking 'I Understand', you acknowledge that you use this launcher at your own risk and that the developers are not responsible for any issues that may arise.")
                 .setIcon(R.drawable.ic_warning)
                 .setPositiveButton("I Understand", (dialog, which) -> {
                     dialog.dismiss();
                     prefs.edit().putBoolean(KEY_DISCLAIMER_SHOWN, true).apply();
-                   
-                    boolean creditsShown = prefs.getBoolean(KEY_CREDITS_SHOWN, false);
-                    boolean themesDialogShown = prefs.getBoolean(KEY_THEMES_DIALOG_SHOWN, false);
-                    boolean githubStarShown = prefs.getBoolean(KEY_GITHUB_STAR_SHOWN, false);
-
-                    if (!creditsShown) {
-                        showThanksDialog(prefs);
-                    } else if (!githubStarShown) { 
-                        showGithubStarDialog(prefs);
-                    } else if (!themesDialogShown) {
-                         // Show themes if needed
-                    }
                 })
                 .setCancelable(false)
                 .show();
     }
 
-    private void showThanksDialog(SharedPreferences prefs) {
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View customView = inflater.inflate(R.layout.dialog_credits, null);
 
-        RecyclerView recycler = customView.findViewById(R.id.credits_recycler);
-
-        List<CreditsAdapter.CreditCard> cards = new ArrayList<>();
-        cards.add(new CreditsAdapter.CreditCard("Yami", "Sukrisus", "https://avatars.githubusercontent.com/u/99645769?v=4", "OWNER"));
-        cards.add(new CreditsAdapter.CreditCard("VCX", "Viablecobra", "https://avatars.githubusercontent.com/u/88580298?v=4", "I am viable👍🏻"));
-        cards.add(new CreditsAdapter.CreditCard("Light", "RadiantByte", "https://avatars.githubusercontent.com/u/198057285?v=4", "💭"));
-        cards.add(new CreditsAdapter.CreditCard("MCPEOVER", "MCPEOVER", "https://avatars.githubusercontent.com/u/118625383?v=4", "MotioBlur dev"));
-        cards.add(new CreditsAdapter.CreditCard("Kitsuri", "Kitsuri-Studios", "https://avatars.githubusercontent.com/u/220755073?v=4", "One Place For All Case: Native Development..."));
-        cards.add(new CreditsAdapter.CreditCard("GX", "dreamguxiang", "https://avatars.githubusercontent.com/u/62042544?v=4", "No Tag line Needed, Already Perfect"));
-        cards.add(new CreditsAdapter.CreditCard("Fzul","faizul726", "https://avatars.githubusercontent.com/u/162413089?v=4", "🌳 Living life..."));
-
-        CreditsAdapter adapter = new CreditsAdapter(this, cards);
-        recycler.setAdapter(adapter);
-
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        recycler.setLayoutManager(layoutManager);
-
-        PagerSnapHelper snapHelper = new PagerSnapHelper();
-        snapHelper.attachToRecyclerView(recycler);
-
-        recycler.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-        @Override
-        public void onLayoutChange(View v, int left, int top, int right, int bottom,
-                                   int oldLeft, int oldTop, int oldRight, int oldBottom) {
-            recycler.removeOnLayoutChangeListener(this);
-            RecyclerView.ViewHolder vh = recycler.findViewHolderForAdapterPosition(0);
-            if (vh != null) {
-                int[] snapDistance = snapHelper.calculateDistanceToFinalSnap(
-                        recycler.getLayoutManager(), vh.itemView);
-                if (snapDistance != null) {
-                    recycler.smoothScrollBy(snapDistance[0], snapDistance[1]);
-                }
-            }
-        }
-    });
-        
-        recycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull RecyclerView rv, int dx, int dy) {
-                for (int i = 0; i < rv.getChildCount(); i++) {
-                    View child = rv.getChildAt(i);
-                    int center = rv.getWidth() / 2;
-                    int childCenter = (child.getLeft() + child.getRight()) / 2;
-                    float distance = Math.abs(center - childCenter);
-                    float scale = Math.max(0.85f, 1f - (distance / rv.getWidth()) * 0.3f);
-                    child.setScaleX(scale);
-                    child.setScaleY(scale);
-                }
-            }
-        });
-
-        new MaterialAlertDialogBuilder(this, com.google.android.material.R.style.ThemeOverlay_Material3_MaterialAlertDialog)
-                .setView(customView)
-                .setPositiveButton("Continue", (dialog, which) -> {
-                    dialog.dismiss();
-                    prefs.edit().putBoolean(KEY_CREDITS_SHOWN, true).apply();
-                    
-                    boolean githubStarShown = prefs.getBoolean(KEY_GITHUB_STAR_SHOWN, false);
-                    if (!githubStarShown) {
-                        showGithubStarDialog(prefs);
-                    }
-                })
-                .setCancelable(false)
-                .show();
-    }
-
-    private void showGithubStarDialog(SharedPreferences prefs) {
-        new MaterialAlertDialogBuilder(this, com.google.android.material.R.style.ThemeOverlay_Material3_MaterialAlertDialog)
-                .setTitle("Star our GitHub! ⭐")
-                .setMessage("If you enjoy Henshin Client, please consider starring our repository on GitHub. It helps us a lot!")
-                .setIcon(R.drawable.ic_info) // You can change this to a star icon if you have one
-                .setPositiveButton("Star", (dialog, which) -> {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Xelo-Client/Xelo-Client")); 
-                    startActivity(browserIntent);
-                    dialog.dismiss();
-                    prefs.edit().putBoolean(KEY_GITHUB_STAR_SHOWN, true).apply();
-                    
-                    // Proceed to Themes check if it hasn't been shown
-                    boolean themesDialogShown = prefs.getBoolean(KEY_THEMES_DIALOG_SHOWN, false);
-                    if (!themesDialogShown) {
-                        // Trigger themes dialog (not implemented in your snippet fully but linked here for flow)
-                        // showThemesDialog(prefs, true); 
-                    }
-                })
-                .setNegativeButton("Maybe Later", (dialog, which) -> {
-                    dialog.dismiss();
-                    prefs.edit().putBoolean(KEY_GITHUB_STAR_SHOWN, true).apply();
-                    
-                    // Proceed to Themes check
-                    boolean themesDialogShown = prefs.getBoolean(KEY_THEMES_DIALOG_SHOWN, false);
-                    if (!themesDialogShown) {
-                        // showThemesDialog(prefs, true);
-                    }
-                })
-                .setCancelable(false)
-                .show();
-    }
-
-    private void animateCardsSequentially(LinearLayout container, int index) {
-        if (index >= container.getChildCount()) return;
-        
-        View card = container.getChildAt(index);
-        animateCardEntrance(card);
-        
-        new Handler().postDelayed(() -> {
-            animateCardsSequentially(container, index + 1);
-        }, 100);  
-    }
-
-
-    private void addCreditCard(LinearLayout container, String handle, String username, String picUrl, String tagline) {
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View card = inflater.inflate(R.layout.credit_card_item, container, false);
-
-        ImageView profilePic = card.findViewById(R.id.profile_pic);
-        TextView profileName = card.findViewById(R.id.profile_name);
-        TextView profileTagline = card.findViewById(R.id.profile_tagline);
-
-        Glide.with(this).load(picUrl).circleCrop().into(profilePic);
-
-        profileName.setText(username);
-        profileTagline.setText(tagline);
-
-        if (handle.equals("Yami")) {
-            profileName.setTextColor(Color.parseColor("#FFD700"));
-            profileTagline.setTextColor(Color.parseColor("#FFD700"));
-            card.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FFF8DC")));
-        }
-
-        if (handle.equals("VCX")) {
-            int neon = Color.parseColor("#00FFFF"); // neon blue/cyan
-            profileName.setTextColor(neon);
-            profileTagline.setTextColor(neon);
-        }
-
-        animateCardEntrance(card);
-
-        card.setScaleX(0.9f);
-        card.setScaleY(0.9f);
-
-        card.setOnClickListener(v -> {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW,
-                    Uri.parse("https://github.com/" + username));
-            startActivity(browserIntent);
-        });
-
-        container.addView(card);
-    }
-
-    private void animateCardEntrance(View card) {
-        card.setAlpha(0f);
-        card.setScaleX(0.8f);
-        card.setScaleY(0.8f);
-        
-        card.animate()
-            .alpha(1f)
-            .scaleX(1f)
-            .scaleY(1f)
-            .setDuration(600)
-            .setInterpolator(new OvershootInterpolator())
-            .start();
-    }
-
-    private void animateCardClick(View card) {
-        card.animate()
-            .scaleX(0.95f)
-            .scaleY(0.95f)
-            .setDuration(100)
-            .withEndAction(() -> {
-                card.animate()
-                    .scaleX(1f)
-                    .scaleY(1f)
-                    .setDuration(150)
-                    .start();
-            })
-            .start();
-    }
-
-    private void focusCard(LinearLayout container, View focused) {
-        for (int i = 0; i < container.getChildCount(); i++) {
-            View child = container.getChildAt(i);
-            float targetScale = (child == focused) ? 1.05f : 0.9f;
-
-            child.animate()
-                    .scaleX(targetScale)
-                    .scaleY(targetScale)
-                    .setDuration(200)
-                    .start();
-        }
-    }
-
-    private void showThemesDialog(SharedPreferences prefs, boolean disclaimerShown) {
-        new MaterialAlertDialogBuilder(this, com.google.android.material.R.style.ThemeOverlay_Material3_MaterialAlertDialog)
-                .setTitle("THEMES!!🎉")
-                .setMessage("Henshin Client now supports custom themes! download themes from https://themes.xeloclient.in or make your own themes from https://docs.xeloclient.com")
-                .setIcon(R.drawable.ic_info)
-                .setPositiveButton("Proceed", (dialog, which) -> {
-                    dialog.dismiss();
-                    prefs.edit().putBoolean(KEY_THEMES_DIALOG_SHOWN, true).apply();
-                    
-                })
-                .setCancelable(false)
-                .show();
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

@@ -40,7 +40,6 @@ public class SettingsFragment extends BaseThemedFragment implements DiscordManag
     private LinearLayout themesButton;
     private LinearLayout configurationButton;
     private LinearLayout aboutButton; 
-    private LinearLayout supportButton;
     private View fragmentView;
     
     // Discord components
@@ -52,20 +51,29 @@ public class SettingsFragment extends BaseThemedFragment implements DiscordManag
     private static final String DEFAULT_PACKAGE_NAME = "com.mojang.minecraftpe";
     private static final String TAG = "SettingsFragment";
     private Handler mainHandler;
+    private SettingsToolsHelper toolsHelper;
     
     private VersionManager versionManager;
     private TextView selectedVersionText;
     private AlertDialog versionDialog;
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Backup / import / config / options.txt .
+        // Must be created before the fragment starts: it registers activity-result launchers.
+        toolsHelper = new SettingsToolsHelper(this);
+    }
+
+    @Override
 public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     fragmentView = inflater.inflate(R.layout.fragment_settings, container, false);
+    if (toolsHelper != null) toolsHelper.bind(fragmentView);
     
     // Initialize themes and about buttons
     themesButton = fragmentView.findViewById(R.id.themes_button);
     configurationButton = fragmentView.findViewById(R.id.configuration_button);
     aboutButton = fragmentView.findViewById(R.id.about_button);
-    supportButton = fragmentView.findViewById(R.id.support_button);
     
     selectedVersionText = fragmentView.findViewById(R.id.selected_version_text);
     
@@ -242,26 +250,6 @@ public void onVersionSelected(GameVersion version) {
                 Toast.makeText(getContext(), "Unable to open about", Toast.LENGTH_SHORT).show();
             }
         });
-        supportButton.setOnClickListener(v -> {
-            try {
-                requireActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .setCustomAnimations(
-                        R.anim.slide_in_right,  
-                        R.anim.slide_out_right, 
-                        R.anim.slide_in_left,   
-                        R.anim.slide_out_left 
-                    )
-                    .replace(android.R.id.content, new SupportFragment())
-                    .addToBackStack(null)
-                    .commit();
-                
-                Log.d(TAG, "Opening support fragment");
-            } catch (Exception e) {
-                Log.e(TAG, "Error opening support", e);
-                Toast.makeText(getContext(), "Unable to open support", Toast.LENGTH_SHORT).show();
-            }
-        });
     }
     
     private void setupDiscordButton() {
@@ -363,7 +351,7 @@ public void onVersionSelected(GameVersion version) {
         box.addView(title);
 
         TextView hint = new TextView(c);
-        hint.setText("Choose the menu style. Open it in game with Right Shift, the menu button, or .gui in chat.");
+        hint.setText("Open it in game with Right Shift, the menu button, or .gui in chat.");
         hint.setTextSize(12);
         hint.setTextColor(ContextCompat.getColor(c, R.color.onSurfaceVariant));
         LinearLayout.LayoutParams hl = new LinearLayout.LayoutParams(-1, -2);
@@ -371,27 +359,9 @@ public void onVersionSelected(GameVersion version) {
         hl.bottomMargin = (int) (12 * d);
         box.addView(hint, hl);
 
-        com.google.android.material.button.MaterialButtonToggleGroup group =
-                new com.google.android.material.button.MaterialButtonToggleGroup(c);
-        group.setSingleSelection(true);
-        group.setSelectionRequired(true);
-        String[] styles = {com.origin.launcher.Launcher.henshin.core.HenshinSettings.GUI_PANEL,
-                com.origin.launcher.Launcher.henshin.core.HenshinSettings.GUI_TOOLBOX};
-        String current = com.origin.launcher.Launcher.henshin.core.HenshinSettings.getGuiStyle(c);
-        for (String st : styles) {
-            MaterialButton b = new MaterialButton(c, null, com.google.android.material.R.attr.materialButtonOutlinedStyle);
-            b.setId(View.generateViewId());
-            b.setText(st);
-            b.setAllCaps(false);
-            group.addView(b, new LinearLayout.LayoutParams(0, -2, 1f));
-            if (st.equals(current)) group.check(b.getId());
-            b.setOnClickListener(v -> com.origin.launcher.Launcher.henshin.core.HenshinSettings.setGuiStyle(c, st));
-        }
-        box.addView(group, new LinearLayout.LayoutParams(-1, -2));
 
         TextView tip = new TextView(c);
-        tip.setText("Panel: one compact window with tabs.  Toolbox: two side panels.\n"
-                + "In-game chat: .bind <module> <key>, .toggle <module>, .shortcut add <module>, .help");
+        tip.setText("In-game chat: .bind <module> <key>, .toggle <module>, .shortcut add <module>, .help");
         tip.setTextSize(11);
         tip.setTextColor(ContextCompat.getColor(c, R.color.onSurfaceVariant));
         LinearLayout.LayoutParams tl = new LinearLayout.LayoutParams(-1, -2);

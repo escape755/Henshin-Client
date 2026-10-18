@@ -412,7 +412,7 @@ public class ClickGuiWindow {
                 break;
             default: // Misc
                 l.add(mod(ModIds.FPS_DISPLAY, s(R.string.inbuilt_mod_fps_display)));
-                l.add(mod("xelo_title", "Henshin Title"));
+                l.add(mod("henshin_title", "Henshin Title"));
                 l.add(new Row(KIND_GUI_STYLE, null, "GUI style"));
                 l.add(new Row(KIND_OPACITY, null, "GUI opacity"));
                 l.add(new Row(KIND_EDIT_LAYOUT, null, "Edit button layout"));

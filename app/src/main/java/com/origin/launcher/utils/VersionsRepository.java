@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 
 public class VersionsRepository {
     private static final String TAG = "VersionsRepository";
-    private static final String REMOTE_URL = "https://raw.githubusercontent.com/Xelo-Client/cdn/refs/heads/main/results.txt";
+    private static final String REMOTE_URL = "https://raw.githubusercontent.com/Henshin-Client/cdn/refs/heads/main/results.txt";
     private static final String CACHE_FILE_NAME = "mcpe_versions.txt";
 
     public static class VersionEntry {

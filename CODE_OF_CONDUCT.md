@@ -47,7 +47,6 @@ Examples of unacceptable behavior include:
 If you witness or experience behavior that violates this Code of Conduct:
 
 - 📧 Contact the maintainers privately on Discord or via GitHub
-- 💬 Use the [official Discord server](https://dsc.gg/origin-client) for support and moderation help
 - 🐞 Open a private issue or email if Discord isn’t an option
 
 All reports will be handled with discretion and confidentiality.
