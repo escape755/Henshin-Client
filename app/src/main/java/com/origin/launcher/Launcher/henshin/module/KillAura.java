@@ -27,7 +27,7 @@ public class KillAura extends Module {
     private final FloatValue range = add(new FloatValue("Range", 3.5f, 1f, 8f, 0.1f));
     private final IntValue cps = add(new IntValue("CPS", 10, 1, 20));
     private final IntValue jitter = add(new IntValue("Jitter", 15, 0, 50, 5));
-    private final IntValue maxTargets = add(new IntValue("Max Targets", 3, 1, 6), () -> mode.is("Multi"));
+    private final IntValue maxTargets = add(new IntValue("Max Targets", 20, 1, 20), () -> mode.is("Multi"));
     private final BoolValue onlyInFov = add(new BoolValue("Only In FOV", false));
 
     private final Random rng = new Random();
@@ -41,6 +41,9 @@ public class KillAura extends Module {
 
     @Override public String getInfo() { return info; }
 
+    /** Without the native bridge there is no entity list, so only the crosshair fallback is possible. */
+    @Override public boolean requiresBridge() { return true; }
+
     @Override protected void onEnable() { nextAttack = 0; switchIndex = 0; }
 
     @Override
@@ -53,7 +56,9 @@ public class KillAura extends Module {
         nextAttack = now + Math.max(20L, (long) (base + j));
 
         if (!game.isAvailable()) {
-            info = "tap";
+            // No entity list available: Mode / Targets / Priority / Range cannot be applied.
+            // This only hits whatever is under the crosshair.
+            info = "tap (no bridge)";
             input.tapCenter();
             return;
         }
