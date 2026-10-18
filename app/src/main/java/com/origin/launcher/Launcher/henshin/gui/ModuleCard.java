@@ -141,11 +141,22 @@ public final class ModuleCard {
                         rebuild.run();
                     });
         }), lp);
+        // Shortcut checkbox (AbySm style): ticked = a floating button that toggles this module
         ShortcutManager sc = ShortcutManager.get();
-        box.addView(buttonRow(act, "Floating shortcut", sc.has(m) ? "Remove" : "Add", accent, v -> {
-            if (sc.has(m)) sc.remove(m); else sc.add(m);
-            rebuild.run();
-        }), lp);
+        LinearLayout scRow = new LinearLayout(act);
+        scRow.setGravity(Gravity.CENTER_VERTICAL);
+        scRow.addView(text(act, "Shortcut", 13, Color.WHITE), new LinearLayout.LayoutParams(0, -2, 1f));
+        final android.widget.CheckBox cb = new android.widget.CheckBox(act);
+        cb.setChecked(sc.has(m));
+        cb.setButtonTintList(new ColorStateList(
+                new int[][]{{android.R.attr.state_checked}, {}},
+                new int[]{accent, 0xFF6A6A72}));
+        cb.setOnCheckedChangeListener((b, checked) -> {
+            if (checked) sc.add(m); else sc.remove(m);
+        });
+        scRow.addView(cb);
+        scRow.setOnClickListener(v -> cb.toggle());
+        box.addView(scRow, lp);
     }
 
     private static View boolRow(Activity act, BoolValue v, int accent, Runnable rebuild) {

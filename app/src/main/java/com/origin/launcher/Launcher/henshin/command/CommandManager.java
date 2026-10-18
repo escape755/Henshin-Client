@@ -17,7 +17,7 @@ import java.util.Arrays;
  *   .bind <module> <key>     .unbind <module>     .binds
  *   .toggle <module>         .set <module> <value> <new value>
  *   .shortcut add|remove <module> | .shortcut edit | .shortcut clear
- *   .gui panel|toolbox       .modules             .help
+ *   .gui                      .modules             .help
  */
 public final class CommandManager extends ChatCommandHook {
     private final Activity activity;
@@ -80,11 +80,7 @@ public final class CommandManager extends ChatCommandHook {
                 case "shortcut": case "sc": {
                     ShortcutManager sm = ShortcutManager.get();
                     String sub = t.length > 1 ? t[1].toLowerCase() : "";
-                    if (sub.equals("edit")) {
-                        boolean on = !HenshinSettings.isShortcutEditMode(activity);
-                        sm.setEditMode(on);
-                        say(on ? "Shortcut edit mode ON: drag to move, long-press to remove" : "Shortcut edit mode OFF");
-                    } else if (sub.equals("clear")) {
+                    if (sub.equals("clear")) {
                         sm.clear();
                         say("All shortcuts removed");
                     } else if ((sub.equals("add") || sub.equals("remove")) && t.length > 2) {
@@ -93,16 +89,11 @@ public final class CommandManager extends ChatCommandHook {
                         if (sub.equals("add")) { sm.add(m); say("Shortcut added: " + m.name); }
                         else { sm.remove(m); say("Shortcut removed: " + m.name); }
                     } else {
-                        say("Usage: .shortcut add|remove <module> | edit | clear");
+                        say("Usage: .shortcut add|remove <module> | clear");
                     }
                     return true;
                 }
                 case "gui": {
-                    if (t.length > 1) {
-                        String s = t[1].equalsIgnoreCase("toolbox") ? HenshinSettings.GUI_TOOLBOX : HenshinSettings.GUI_PANEL;
-                        HenshinSettings.setGuiStyle(activity, s);
-                        say("ClickGUI style: " + s);
-                    }
                     GuiLauncher.toggle(activity);
                     return true;
                 }
@@ -113,7 +104,7 @@ public final class CommandManager extends ChatCommandHook {
                     return true;
                 }
                 case "help": {
-                    say(".bind <mod> <key> | .unbind | .binds | .toggle | .set <mod> <value> <x> | .shortcut add|remove|edit|clear | .gui | .modules");
+                    say(".bind <mod> <key> | .unbind | .binds | .toggle | .set <mod> <value> <x> | .shortcut add|remove|clear | .gui | .modules");
                     return true;
                 }
                 default:

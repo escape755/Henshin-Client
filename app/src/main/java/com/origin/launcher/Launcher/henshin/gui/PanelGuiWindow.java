@@ -184,29 +184,15 @@ public final class PanelGuiWindow {
         box.setPadding(dp(16), dp(6), dp(16), dp(6));
 
         TextView info = ModuleCard.text(act,
-                "Floating buttons that toggle a module. Add them from a module's gear (\"Floating shortcut\") "
-                        + "or with .shortcut add <module>. Turn on edit mode to drag them anywhere; long-press to delete.",
+                "Tick \"Shortcut\" in a module's settings (gear) to get a floating button for it. "
+                        + "Tap the button to toggle the module, drag it to move it. "
+                        + "Also: .shortcut add <module>.",
                 11, 0xFFBBBBBB);
         box.addView(info);
 
-        com.google.android.material.materialswitch.MaterialSwitch edit = ModuleCard.newSwitch(act);
-        boolean on = HenshinSettings.isShortcutEditMode(act);
-        edit.setChecked(on);
-        ModuleCard.style(edit, on, accent);
-        edit.setOnCheckedChangeListener((b, c) -> { sm.setEditMode(c); ModuleCard.style(edit, c, accent); });
-        LinearLayout row = new LinearLayout(act);
-        row.setGravity(Gravity.CENTER_VERTICAL);
-        row.addView(ModuleCard.text(act, "Edit mode (move / delete)", 13, Color.WHITE), new LinearLayout.LayoutParams(0, -2, 1f));
-        row.addView(edit);
-        LinearLayout.LayoutParams rl = new LinearLayout.LayoutParams(-1, -2);
-        rl.topMargin = dp(10);
-        box.addView(row, rl);
-
         LinearLayout.LayoutParams sl = new LinearLayout.LayoutParams(-1, -2);
         sl.topMargin = dp(10);
-        box.addView(ModuleCard.slider(act, "Button size (dp)", 36, 96, sm.getSizeDp(), 2, accent,
-                n -> String.valueOf(n), n -> sm.setSizeDp(n)), sl);
-        box.addView(ModuleCard.slider(act, "Opacity (%)", 20, 100, sm.getOpacity(), 5, accent,
+        box.addView(ModuleCard.slider(act, "Shortcut opacity (%)", 20, 100, sm.getOpacity(), 5, accent,
                 n -> String.valueOf(n), n -> sm.setOpacity(n)), sl);
 
         TextView clear = ModuleCard.text(act, "Remove all shortcuts", 13, Color.WHITE);

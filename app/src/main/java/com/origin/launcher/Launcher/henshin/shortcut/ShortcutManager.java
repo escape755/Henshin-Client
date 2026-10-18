@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.origin.launcher.Launcher.henshin.core.HenshinSettings;
 import com.origin.launcher.Launcher.henshin.core.Module;
 import com.origin.launcher.Launcher.henshin.core.ModuleManager;
 
@@ -12,8 +11,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Floating on-screen buttons that toggle a module. They can be placed anywhere on the screen:
- * turn on edit mode (Settings or ".shortcut edit"), drag them where you want, long-press to delete.
+ * Floating on-screen buttons that toggle a module (AbySm-style). Tick "Shortcut" on a module to get
+ * its button; tap it to toggle the module, drag it anywhere. Positions are remembered per module.
  */
 public final class ShortcutManager {
     private static final String PREFS = "henshin_shortcuts";
@@ -58,7 +57,7 @@ public final class ShortcutManager {
         if (activity == null || has(m)) return;
         float density = activity.getResources().getDisplayMetrics().density;
         float x = 24 * density;
-        float y = (90 + 60 * positions.size()) * density;
+        float y = (90 + 36 * positions.size()) * density;
         positions.put(m.name, new float[]{x, y});
         savePositions();
         showOne(m.name);
@@ -78,17 +77,7 @@ public final class ShortcutManager {
         savePositions();
     }
 
-    public void setEditMode(boolean on) {
-        if (activity != null) HenshinSettings.setShortcutEditMode(activity, on);
-        for (ShortcutButton b : buttons.values()) b.refresh();
-    }
-
-    public int getSizeDp() { return prefs == null ? 52 : prefs.getInt("size_dp", 52); }
-    public void setSizeDp(int dp) {
-        if (prefs != null) prefs.edit().putInt("size_dp", Math.max(36, Math.min(96, dp))).apply();
-        reshow();
-    }
-    public int getOpacity() { return prefs == null ? 90 : prefs.getInt("opacity", 90); }
+    public int getOpacity() { return prefs == null ? 100 : prefs.getInt("opacity", 100); }
     public void setOpacity(int pct) {
         if (prefs != null) prefs.edit().putInt("opacity", Math.max(20, Math.min(100, pct))).apply();
         for (ShortcutButton b : buttons.values()) b.refresh();
@@ -99,18 +88,7 @@ public final class ShortcutManager {
         savePositions();
     }
 
-    void requestRemove(String name) {
-        Module m = ModuleManager.get().find(name);
-        if (m != null) remove(m);
-    }
-
     // ------------------------------------------------------------------
-
-    private void reshow() {
-        for (ShortcutButton b : buttons.values()) b.hide();
-        buttons.clear();
-        showAll();
-    }
 
     private void showAll() {
         for (String n : positions.keySet()) showOne(n);

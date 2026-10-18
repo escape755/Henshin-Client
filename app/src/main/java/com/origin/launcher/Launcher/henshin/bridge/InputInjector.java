@@ -49,7 +49,31 @@ public class InputInjector {
 
     public boolean isHolding() { return holding; }
 
+    private final java.util.Set<Integer> heldKeys = new java.util.HashSet<>();
+
+    /** Presses a key and keeps it down until {@link #keyUp} / {@link #releaseAll}. */
+    public void keyDown(int keyCode) {
+        if (!heldKeys.add(keyCode)) return;
+        long t = SystemClock.uptimeMillis();
+        KeyEvent down = new KeyEvent(t, t, KeyEvent.ACTION_DOWN, keyCode, 0, 0, -1, 0, 0, InputDevice.SOURCE_KEYBOARD);
+        try { activity.dispatchKeyEvent(down); } catch (Exception ignored) {}
+    }
+
+    public void keyUp(int keyCode) {
+        if (!heldKeys.remove(keyCode)) return;
+        long t = SystemClock.uptimeMillis();
+        KeyEvent up = new KeyEvent(t, t, KeyEvent.ACTION_UP, keyCode, 0, 0, -1, 0, 0, InputDevice.SOURCE_KEYBOARD);
+        try { activity.dispatchKeyEvent(up); } catch (Exception ignored) {}
+    }
+
+    /** Two quick presses (e.g. double-tap jump toggles creative flight). */
+    public void doubleKey(int keyCode) {
+        key(keyCode);
+        handler.postDelayed(() -> key(keyCode), 120);
+    }
+
     public void releaseAll() {
+        for (Integer k : new java.util.ArrayList<>(heldKeys)) keyUp(k);
         handler.removeCallbacksAndMessages(null);
         if (holding) {
             long n = SystemClock.uptimeMillis();

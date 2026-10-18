@@ -64,6 +64,9 @@ public abstract class Module {
         if (on) { try { onEnable(); } catch (Throwable ignored) {} }
     }
 
+    /** Sets the flag without running onEnable/onDisable or notifying anyone (state mirrored from a file). */
+    void setEnabledSilently(boolean on) { enabled = on; }
+
     public void toggle() { setEnabled(!enabled); }
 
     /** Short status text shown next to the name in the GUI (optional). */
@@ -73,6 +76,17 @@ public abstract class Module {
     protected void onDisable() {}
     /** Called ~20 times a second while enabled, on the main thread. */
     public void onTick(GameBridge game, InputInjector input) {}
+
+    /**
+     * For modules that cannot work at all without game-memory access: tells the player and switches
+     * the module off again. Call from onEnable and return when it answers true.
+     */
+    protected final boolean failWithoutBridge() {
+        if (ModuleManager.get().getBridge().isAvailable()) return false;
+        ModuleManager.get().toast(name + " needs game-memory access, which this build doesn't have.");
+        new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> setEnabled(false));
+        return true;
+    }
 
     /** Needs the native game bridge to do anything useful. */
     public boolean requiresBridge() { return false; }
