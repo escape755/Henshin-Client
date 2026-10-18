@@ -13,15 +13,7 @@ import com.origin.launcher.Launcher.henshin.bridge.GameBridge;
 import com.origin.launcher.Launcher.henshin.bridge.InputInjector;
 import com.origin.launcher.Launcher.henshin.bridge.NativeGameBridge;
 import com.origin.launcher.Launcher.henshin.module.AutoEat;
-import com.origin.launcher.Launcher.henshin.module.Aura;
-import com.origin.launcher.Launcher.henshin.module.ConfigModule;
-import com.origin.launcher.Launcher.henshin.module.LegitModules;
 import com.origin.launcher.Launcher.henshin.module.Desync;
-import com.origin.launcher.Launcher.henshin.module.Fly;
-import com.origin.launcher.Launcher.henshin.module.Hitbox;
-import com.origin.launcher.Launcher.henshin.module.Jetpack;
-import com.origin.launcher.Launcher.henshin.module.Surround;
-import com.origin.launcher.Launcher.henshin.module.Velocity;
 import com.origin.launcher.Launcher.henshin.module.ItemEsp;
 import com.origin.launcher.Launcher.henshin.module.KillAura;
 import com.origin.launcher.Launcher.henshin.module.Spider;
@@ -83,13 +75,6 @@ public final class ModuleManager {
         modules.add(new ItemEsp());
         modules.add(new AutoEat());
         modules.add(new Desync());
-        modules.add(new Aura());
-        modules.add(new Hitbox());
-        modules.add(new Surround());
-        modules.add(new Fly());
-        modules.add(new Jetpack());
-        modules.add(new Velocity());
-        modules.addAll(LegitModules.create());
     }
 
     // ------------------------------------------------------------------ lifecycle
@@ -106,12 +91,8 @@ public final class ModuleManager {
         handler.removeCallbacks(tick);
         ticking = false;
         for (Module m : modules) {
-            // Legit modules mirror config.json, which the game reads: never switch them off on exit.
-            if (m instanceof ConfigModule) continue;
-            // stopForExit keeps the saved preference, so modules stay on after reopening the game.
-            try { m.stopForExit(); } catch (Throwable ignored) {}
+            if (m.isEnabled()) { try { m.setEnabled(false); } catch (Throwable ignored) {} }
         }
-        heldKeys.clear();
         if (input != null) input.releaseAll();
         activity = null;
         input = null;
@@ -143,8 +124,6 @@ public final class ModuleManager {
     }
 
     public GameBridge getBridge() { return bridge; }
-    /** Synthetic input (taps / keys); null while no game activity is attached. */
-    public InputInjector getInput() { return input; }
     public Activity getActivity() { return activity; }
     public void addToggleListener(Runnable r) { toggleListeners.add(r); }
     public void removeToggleListener(Runnable r) { toggleListeners.remove(r); }
@@ -168,12 +147,6 @@ public final class ModuleManager {
 
     // ------------------------------------------------------------------ keybinds
 
-    private final java.util.Set<Integer> heldKeys =
-            java.util.Collections.synchronizedSet(new java.util.HashSet<>());
-
-    /** True while that Android key code is physically held (hardware keyboard / gamepad). */
-    public boolean isKeyDown(int keyCode) { return heldKeys.contains(keyCode); }
-
     public void setBind(Module m, int keyCode) {
         m.setKeyCodeInternal(keyCode);
         saveModule(m);
@@ -182,9 +155,6 @@ public final class ModuleManager {
 
     /** @return true when the key event was consumed as a module bind. */
     public boolean onKeyEvent(KeyEvent e) {
-        // Remember which physical keys are held (Fly reads WASD / Space / Shift from here).
-        if (e.getAction() == KeyEvent.ACTION_DOWN) heldKeys.add(e.getKeyCode());
-        else if (e.getAction() == KeyEvent.ACTION_UP) heldKeys.remove(e.getKeyCode());
         if (activity == null || e.getKeyCode() == 0) return false;
         Module target = null;
         for (Module m : modules) if (m.getKeyCode() == e.getKeyCode()) { target = m; break; }
@@ -206,12 +176,7 @@ public final class ModuleManager {
             String s = prefs.getString(p + "v." + v.name, null);
             if (s != null) v.deserialize(s);
         }
-        if (m instanceof ConfigModule) {
-            // State lives in config.json (shared with the game), not in our prefs.
-            m.setEnabledSilently(((ConfigModule) m).readState());
-        } else {
-            m.restoreEnabled(prefs.getBoolean(p + "enabled", false));
-        }
+        m.restoreEnabled(prefs.getBoolean(p + "enabled", false));
     }
 
     void saveModule(Module m) {
