@@ -29,6 +29,15 @@ import com.origin.launcher.Launcher.henshin.module.Watermark;
 import com.origin.launcher.Launcher.henshin.module.AutoWalk;
 import com.origin.launcher.Launcher.henshin.module.AntiAFK;
 import com.origin.launcher.Launcher.henshin.value.Value;
+import com.abysm.client.game.module.misc.AutoDisconnectModule;
+import com.abysm.client.game.module.motion.AirJumpModule;
+import com.abysm.client.game.module.motion.BhopModule;
+import com.abysm.client.game.module.motion.HighJumpModule;
+import com.abysm.client.game.module.motion.MotionFlyModule;
+import com.abysm.client.game.module.motion.NoClipModule;
+import com.abysm.client.game.module.motion.SpeedModule;
+import com.abysm.client.game.module.motion.SprintModule;
+
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -97,6 +106,16 @@ public final class ModuleManager {
         modules.add(new AutoWalk());
         modules.add(new AntiAFK());
         modules.addAll(LegitModules.create());
+
+        // --- AbySm-compat modules (Kotlin, package com.abysm.client.game) ---
+        modules.add(new SprintModule());
+        modules.add(new SpeedModule());
+        modules.add(new BhopModule());
+        modules.add(new HighJumpModule());
+        modules.add(new AirJumpModule());
+        modules.add(new MotionFlyModule());
+        modules.add(new NoClipModule());
+        modules.add(new AutoDisconnectModule());
     }
 
     // ------------------------------------------------------------------ lifecycle

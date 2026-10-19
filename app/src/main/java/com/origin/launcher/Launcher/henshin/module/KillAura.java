@@ -21,8 +21,8 @@ import java.util.Random;
  * crosshair at the configured CPS (like the Auto Clicker).
  */
 public class KillAura extends Module {
-    private final EnumValue mode = add(new EnumValue("Mode", "Single", "Single", "Switch", "Multi"));
-    private final EnumValue targets = add(new EnumValue("Targets", "Players", "Players", "Mobs", "All"));
+    private final EnumValue mode = add(new EnumValue("Mode", "Multi", "Single", "Switch", "Multi"));
+    private final EnumValue targets = add(new EnumValue("Targets", "All", "Players", "Mobs", "All"));
     private final EnumValue priority = add(new EnumValue("Priority", "Distance", "Distance", "Angle", "Health"));
     private final FloatValue range = add(new FloatValue("Range", 3.5f, 1f, 8f, 0.1f));
     private final IntValue cps = add(new IntValue("CPS", 10, 1, 20));

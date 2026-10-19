@@ -12,7 +12,8 @@ import com.origin.launcher.Launcher.henshin.value.IntValue;
 
 /** Constantly pushes you in the direction you are looking (horizontal and vertical). */
 public class Jetpack extends Module {
-    private final FloatValue speed = add(new FloatValue("Speed", 1.0f, 0.2f, 3.0f, 0.1f));
+    private final FloatValue speed = add(new FloatValue("Speed", 1.2f, 0.2f, 4.0f, 0.1f));
+    private final FloatValue verticalBoost = add(new FloatValue("Vertical Boost", 1.5f, 0.5f, 3.0f, 0.1f));
     private final BoolValue fastStop = add(new BoolValue("Fast Stop", false));
 
     public Jetpack() { super("Jetpack", "It JetPack :D", Category.MOVEMENT); }
@@ -38,14 +39,14 @@ public class Jetpack extends Module {
         float s = speed.get();
         game.setMotion(
                 (float) (Math.cos(yaw) * Math.cos(pitch) * s),
-                (float) (Math.sin(pitch) * s),
+                (float) (Math.sin(pitch) * s * verticalBoost.get()),
                 (float) (Math.sin(yaw) * Math.cos(pitch) * s));
     }
 
     private String info = "";
     /** Text shown next to the name in the GUI: the speed, or "forward" while using the fallback. */
     @Override public String getInfo() {
-        return !info.isEmpty() ? info : String.format(java.util.Locale.US, "%.1f", speed.get());
+        return !info.isEmpty() ? info : String.format(java.util.Locale.US, "%.1f | V%.1f", speed.get(), verticalBoost.get());
     }
 
     @Override protected void onDisable() {
