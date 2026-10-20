@@ -29,6 +29,10 @@ public final class LegitModules {
         l.add(new ConfigModule("No Bow animation", "Disables the bow animation", "no_bow_animation", false));
         l.add(new ConfigModule("Portal optimizer", "Optimizes the portal effect", "portal_optimizer", false));
         l.add(new ConfigModule("Particle single mapping", "Optimizes the particles material (culling on, particle fog off)", "psm", false));
+        // These three exist in the Rust source (app/src/main/rust/mtbinloader2) but not in the prebuilt .so
+        l.add(new ConfigModule("No Weather", "Hides rain and snow (needs the rebuilt libmtbinloader2)", "no_weather", false));
+        l.add(new ConfigModule("No Stars", "Removes the stars from the night sky (needs the rebuilt libmtbinloader2)", "no_stars", false));
+        l.add(new ConfigModule("No Sun & Moon", "Removes the sun and the moon (needs the rebuilt libmtbinloader2)", "no_sun&moon", false));
         l.add(new ConfigModule("Custom CrossHair", "Lets you use your own crosshair", "custom_cross_hair", false));
         return l;
     }

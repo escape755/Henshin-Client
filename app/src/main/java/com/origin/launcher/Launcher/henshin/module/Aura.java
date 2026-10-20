@@ -53,8 +53,8 @@ public class Aura extends Module {
     @Override
     public void onTick(GameBridge game, InputInjector input) {
         if (ModuleManager.get().guiOpen) return;
-        if (!game.isAvailable()) {
-            // No entity list: all we can do is hit whatever is under the crosshair, on the same interval.
+        if (!game.canAttack()) {
+            // No native attack: all we can do is hit whatever is under the crosshair, on the same interval.
             info = "tap";
             if (++sinceAttack >= Math.max(1, interval.get())) {
                 sinceAttack = 0;

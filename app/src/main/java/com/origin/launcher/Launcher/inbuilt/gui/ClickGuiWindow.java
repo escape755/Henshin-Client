@@ -537,8 +537,8 @@ public class ClickGuiWindow {
         value.setTextColor(ACCENT);
         main.addView(value);
         main.setOnClickListener(v -> {
-            boolean toolbox = HenshinSettings.GUI_TOOLBOX.equals(HenshinSettings.getGuiStyle(activity));
-            String next = toolbox ? HenshinSettings.GUI_PANEL : HenshinSettings.GUI_TOOLBOX;
+            boolean tbui = HenshinSettings.GUI_TBUI.equals(HenshinSettings.getGuiStyle(activity));
+            String next = tbui ? HenshinSettings.GUI_PANEL : HenshinSettings.GUI_TBUI;
             HenshinSettings.setGuiStyle(activity, next);
             value.setText(next);
             ModuleManager.get().toast("Next time the ClickGUI opens it will use: " + next);

@@ -13,6 +13,9 @@ import com.origin.launcher.Launcher.henshin.bridge.GameBridge;
 import com.origin.launcher.Launcher.henshin.bridge.InputInjector;
 import com.origin.launcher.Launcher.henshin.bridge.NativeGameBridge;
 import com.origin.launcher.Launcher.henshin.module.AutoEat;
+import com.origin.launcher.Launcher.henshin.module.Fullbright;
+import com.origin.launcher.Launcher.henshin.module.TimeChanger;
+import com.origin.launcher.Launcher.henshin.module.WeatherChanger;
 import com.origin.launcher.Launcher.henshin.module.Aura;
 import com.origin.launcher.Launcher.henshin.module.ConfigModule;
 import com.origin.launcher.Launcher.henshin.module.LegitModules;
@@ -105,6 +108,10 @@ public final class ModuleManager {
         modules.add(new Watermark());
         modules.add(new AutoWalk());
         modules.add(new AntiAFK());
+        // BedrockTools ports (native, need libhenshin_core.so)
+        modules.add(new Fullbright());
+        modules.add(new TimeChanger());
+        modules.add(new WeatherChanger());
         modules.addAll(LegitModules.create());
 
         // --- AbySm-compat modules (Kotlin, package com.abysm.client.game) ---
@@ -125,6 +132,7 @@ public final class ModuleManager {
         input = new InputInjector(a);
         prefs = a.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         for (Module m : modules) load(m);
+        NativeGameBridge.probeAsync();
         schedule();
     }
 

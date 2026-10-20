@@ -25,3 +25,4 @@ rootProject.name = "mbloader"
 include ':app'
 include ':minecraft'
 include ':minecraft-msftauth'
+include ':OpenTBUI'

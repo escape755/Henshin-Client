@@ -55,10 +55,10 @@ public class KillAura extends Module {
         double j = base * (jitter.get() / 100.0) * (rng.nextDouble() * 2 - 1);
         nextAttack = now + Math.max(20L, (long) (base + j));
 
-        if (!game.isAvailable()) {
-            // No entity list available: Mode / Targets / Priority / Range cannot be applied.
+        if (!game.canAttack()) {
+            // No native attack: Mode / Targets / Priority / Range cannot be applied.
             // This only hits whatever is under the crosshair.
-            info = "tap (no bridge)";
+            info = "tap (no attack hook)";
             input.tapCenter();
             return;
         }

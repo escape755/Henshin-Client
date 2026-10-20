@@ -1,0 +1,30 @@
+name: Build libmtbinloader2 (Rust)
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'app/src/main/rust/mtbinloader2/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app/src/main/rust/mtbinloader2
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Rust
+        run: rustup update stable
+      - name: Install cross-compilation tools
+        uses: taiki-e/setup-cross-toolchain-action@v1
+        with:
+          target: aarch64-linux-android
+      - name: Build
+        run: cargo build --profile githubci
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: libmtbinloader2-arm64
+          # copy this file over app/src/main/jniLibs/arm64-v8a/libmtbinloader2.so
+          path: app/src/main/rust/mtbinloader2/target/aarch64-linux-android/githubci/libmtbinloader2.so

@@ -19,8 +19,16 @@ import java.io.FileWriter;
  */
 public class ConfigModule extends Module {
     private static final String TAG = "ConfigModule";
+    /** Primary file (what the rebuilt libmtbinloader2 from app/src/main/rust reads). */
     private static final File CONFIG =
             new File("/storage/emulated/0/games/henshin_app/henshin_mods/config.json");
+    /**
+     * The prebuilt libmtbinloader2.so shipped in jniLibs was compiled with another folder and another
+     * key for the title ("hnsn_mods/config.json", "hnsn_title"). Writing both keeps the toggles working
+     * with either build.
+     */
+    private static final File LEGACY_CONFIG =
+            new File("/storage/emulated/0/games/henshin_app/hnsn_mods/config.json");
     private static final Object LOCK = new Object();
 
     private final String key;
@@ -46,25 +54,32 @@ public class ConfigModule extends Module {
 
     private void write(boolean value) {
         synchronized (LOCK) {
-            try {
-                JSONObject json = readConfig();
-                json.put(key, value);
-                File dir = CONFIG.getParentFile();
-                if (dir != null && !dir.exists()) dir.mkdirs();
-                try (FileWriter w = new FileWriter(CONFIG)) {
-                    w.write(json.toString(2));
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "Could not save " + key, e);
-            }
+            save(CONFIG, key, value);
+            save(LEGACY_CONFIG, "henshin_title".equals(key) ? "hnsn_title" : key, value);
         }
     }
 
-    private static JSONObject readConfig() {
+    private static void save(File file, String k, boolean value) {
         try {
-            if (!CONFIG.exists()) return new JSONObject();
+            JSONObject json = readConfig(file);
+            json.put(k, value);
+            File dir = file.getParentFile();
+            if (dir != null && !dir.exists()) dir.mkdirs();
+            try (FileWriter w = new FileWriter(file)) {
+                w.write(json.toString(2));
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Could not save " + k + " to " + file, e);
+        }
+    }
+
+    private static JSONObject readConfig() { return readConfig(CONFIG); }
+
+    private static JSONObject readConfig(File file) {
+        try {
+            if (!file.exists()) return new JSONObject();
             StringBuilder sb = new StringBuilder();
-            try (BufferedReader r = new BufferedReader(new FileReader(CONFIG))) {
+            try (BufferedReader r = new BufferedReader(new FileReader(file))) {
                 String line;
                 while ((line = r.readLine()) != null) sb.append(line);
             }

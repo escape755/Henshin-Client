@@ -1,0 +1,111 @@
+package dev1503.opentbui.widgets;
+
+import static com.warkiz.widget.SizeUtils.dp2px;
+
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+
+import androidx.appcompat.widget.AppCompatEditText;
+
+import java.util.Objects;
+
+import dev1503.opentbui.OpenTBUI;
+import dev1503.opentbui.UIFactory;
+import dev1503.opentbui.picker.TextInputting;
+
+public class TBEditText extends TBWidget{
+    AppCompatEditText editText;
+    OnTextInputFinishListener onTextInputFinishListener;
+
+    public TBEditText(OpenTBUI openTBUI, String name, String path, CharSequence defaultText, OnTextInputFinishListener _onTextInputFinishListener) {
+        super(openTBUI, name, path);
+        view = new LinearLayout(context);
+        view.setLayoutParams(new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        ));
+        this.onTextInputFinishListener = _onTextInputFinishListener;
+        view.setPadding(dp2px(context, 12), 0, dp2px(context, 12), 0);
+        editText = (AppCompatEditText) UIFactory.buildEditTextLayout(context);
+        view.addView(editText);
+        editText.setHint(name);
+        editText.setText(defaultText);
+        editText.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                new TextInputting(context, openTBUI.getTheme(), Objects.requireNonNull(editText.getText()).toString(), text -> {
+                    editText.setText(text);
+                    if (onTextInputFinishListener != null) {
+                        onTextInputFinishListener.onTextInputFinish(text);
+                    }
+                }).setHint(name);
+            }
+        });
+        editText.setOnClickListener(v -> {
+            if (editText.hasFocus()) {
+                new TextInputting(context, openTBUI.getTheme(), Objects.requireNonNull(editText.getText()).toString(), text -> {
+                    editText.setText(text);
+                    if (onTextInputFinishListener != null) {
+                        onTextInputFinishListener.onTextInputFinish(text);
+                    }
+                }).setHint(name);
+            }
+        });
+    }
+    public TBEditText(OpenTBUI openTBUI, String name, String path, CharSequence defaultText) {
+        this(openTBUI, name, path, defaultText, null);
+    }
+    public TBEditText(OpenTBUI openTBUI, String name, String path, OnTextInputFinishListener onTextInputFinishListener) {
+        this(openTBUI, name, path, "", onTextInputFinishListener);
+    }
+    public TBEditText(OpenTBUI openTBUI, String name, String path) {
+        this(openTBUI, name, path, "");
+    }
+    public TBEditText(OpenTBUI openTBUI, String name) {
+        this(openTBUI, name, null, "");
+    }
+    public TBEditText(OpenTBUI openTBUI) {
+        this(openTBUI, "", "", "");
+    }
+    public TBEditText(OpenTBUI openTBUI, String name, CharSequence defaultText) {
+        this(openTBUI, name, null, defaultText);
+    }
+    public TBEditText(OpenTBUI openTBUI, String name, OnTextInputFinishListener onTextInputFinishListener) {
+        this(openTBUI, name, null, "", onTextInputFinishListener);
+    }
+    public TBEditText(OpenTBUI openTBUI, OnTextInputFinishListener onTextInputFinishListener) {
+        this(openTBUI, "", null, "", onTextInputFinishListener);
+    }
+
+    public TBEditText setOnTextInputFinishListener(OnTextInputFinishListener onTextInputFinishListener) {
+        this.onTextInputFinishListener = onTextInputFinishListener;
+        return this;
+    }
+
+    public interface OnTextInputFinishListener {
+        void onTextInputFinish(String text);
+    }
+    public String getText() {
+        return editText.getText().toString();
+    }
+    public TBEditText setTextWithoutNotify(String text) {
+        editText.setText(text);
+        return this;
+    }
+    public TBEditText setText(String text) {
+        setTextWithoutNotify(text);
+        if (onTextInputFinishListener != null) {
+            onTextInputFinishListener.onTextInputFinish(text);
+        }
+        return this;
+    }
+    public TBEditText setMaxLines(int maxLines) {
+        editText.setMaxLines(maxLines);
+        return this;
+    }
+    public AppCompatEditText getEditText() {
+        return editText;
+    }
+}

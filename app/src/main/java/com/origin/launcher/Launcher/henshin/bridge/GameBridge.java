@@ -10,6 +10,18 @@ public interface GameBridge {
 
     boolean isAvailable();
 
+    /** Bit flags for {@link #caps()}. */
+    int CAP_ATTACK = 1, CAP_MOVE = 2;
+
+    /**
+     * What the native side really implements. {@link #isAvailable()} only says that the game state
+     * can be read; attack() / setMotion() may still be stubs, and then modules must use their
+     * input fallbacks.
+     */
+    default int caps() { return 0; }
+    default boolean canAttack() { return (caps() & CAP_ATTACK) != 0; }
+    default boolean canMove() { return (caps() & CAP_MOVE) != 0; }
+
     /** {x, y, z, yaw, pitch} or null. */
     float[] playerState();
 

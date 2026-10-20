@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
 public final class HenshinSettings {
     public static final String GUI_TOOLBOX = "Toolbox";
     public static final String GUI_PANEL = "Panel";
+    /** OpenTBUI (Toolbox-style) ClickGUI, see TbuiGuiWindow. */
+    public static final String GUI_TBUI = "TBUI";
     private static final String PREFS = "henshin_settings";
 
     private HenshinSettings() {}

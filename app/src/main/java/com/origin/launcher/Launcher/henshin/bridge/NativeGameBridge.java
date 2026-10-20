@@ -21,6 +21,8 @@ public final class NativeGameBridge implements GameBridge {
     }
 
     private static native boolean nReady();
+    private static native boolean nProbe();
+    private static native int nCaps();
     private static native float[] nPlayerState();
     private static native float[] nEntities(float range);
     private static native boolean nAttack(long id);
@@ -48,6 +50,24 @@ public final class NativeGameBridge implements GameBridge {
     }
 
     @Override public boolean isAvailable() { return safeReady(); }
+
+    @Override public int caps() {
+        if (!safeReady()) return 0;
+        try { return nCaps(); } catch (UnsatisfiedLinkError e) { return 0; }
+    }
+
+    /** Runs the native RTTI probe in the background once the game library is loaded (writes rtti_probe.txt). */
+    public static void probeAsync() {
+        if (!loaded) return;
+        Thread t = new Thread(() -> {
+            for (int i = 0; i < 120; i++) {
+                try { if (nProbe()) return; } catch (Throwable e) { return; }
+                try { Thread.sleep(2000); } catch (InterruptedException e) { return; }
+            }
+        }, "henshin-probe");
+        t.setDaemon(true);
+        t.start();
+    }
     @Override public float[] playerState() { return safeReady() ? nPlayerState() : null; }
     @Override public float[] nearbyEntities(float r) { return safeReady() ? nEntities(r) : new float[0]; }
     @Override public boolean attack(long id) { return safeReady() && nAttack(id); }

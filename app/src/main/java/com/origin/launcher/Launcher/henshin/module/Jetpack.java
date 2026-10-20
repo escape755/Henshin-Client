@@ -22,7 +22,7 @@ public class Jetpack extends Module {
 
     @Override
     public void onTick(GameBridge game, InputInjector input) {
-        if (!game.isAvailable()) {
+        if (!game.canMove()) {
             // Fallback: keep W held (forward). Combined with the game's own flight it moves you where you look.
             info = "forward";
             if (input == null) return;

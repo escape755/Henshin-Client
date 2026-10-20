@@ -108,6 +108,8 @@ repositories {
 dependencies {
     implementation project(':minecraft')
     implementation project(':minecraft-msftauth')
+    implementation project(':OpenTBUI')
+    implementation 'com.google.android.flexbox:flexbox:3.0.0'
     implementation libs.androidx.preference.ktx
     implementation libs.androidx.games.activity
     implementation libs.appcompat

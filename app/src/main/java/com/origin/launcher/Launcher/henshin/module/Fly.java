@@ -34,7 +34,7 @@ public class Fly extends Module {
     @Override protected void onEnable() {
         fallbackToggled = false;
         ModuleManager mm = ModuleManager.get();
-        if (!mm.getBridge().isAvailable() && mm.getInput() != null) {
+        if (!mm.getBridge().canMove() && mm.getInput() != null) {
             mm.getInput().doubleKey(KeyEvent.KEYCODE_SPACE);
             fallbackToggled = true;
         }
@@ -42,7 +42,7 @@ public class Fly extends Module {
 
     @Override
     public void onTick(GameBridge game, InputInjector input) {
-        if (!game.isAvailable()) return;
+        if (!game.canMove()) return;
         float[] st = game.playerState();
         if (st == null || st.length < 5) return;
 
@@ -73,7 +73,7 @@ public class Fly extends Module {
         game.setMotion(mx, y, mz);
     }
 
-    @Override public String getInfo() { return ModuleManager.get().getBridge().isAvailable()
+    @Override public String getInfo() { return ModuleManager.get().getBridge().canMove()
             ? String.format(java.util.Locale.US, "H%.1f V%.1f", hSpeed.get(), vSpeed.get()) : "creative"; }
 
     @Override protected void onDisable() {
